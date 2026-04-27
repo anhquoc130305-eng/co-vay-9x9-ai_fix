@@ -26,18 +26,5 @@ streamlit run app.py
 
 Sau đó trình duyệt sẽ tự mở game.
 
-## Cách deploy để có link web
-
-1. Up toàn bộ project này lên GitHub
-2. Vào https://streamlit.io/cloud
-3. Đăng nhập bằng GitHub
-4. Chọn repo này
-5. File chạy chính chọn:
-
-```text
-app.py
-```
-
-6. Deploy
-
-Sau khi deploy, bạn sẽ có link web để gửi cho người khác chơi trực tiếp.
+### Chạy Test 
+https://co-vay-9x9-aifix-qzxnp6cszk2jtchehu5dpp.streamlit.app/
