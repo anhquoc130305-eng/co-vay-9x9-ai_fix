@@ -75,8 +75,80 @@ def player_move(x, y):
     check_game_over()
 
 
-st.title("⚫ CỜ VÂY 9x9 - AI MINIMAX ALPHA-BETA")
-st.write("Người chơi: **X** | AI: **O**")
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #fff8ec, #eef6ff);
+    }
+
+    h1 {
+        text-align: center;
+        color: #1f2937;
+        font-weight: 800;
+    }
+
+    .sub-title {
+        text-align: center;
+        font-size: 18px;
+        color: #374151;
+        margin-bottom: 20px;
+    }
+
+    [data-testid="stMetric"] {
+        background-color: white;
+        padding: 18px;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    div[data-testid="stAlert"] {
+        border-radius: 12px;
+        background-color: #e8f2ff;
+        color: #0f4c81;
+        border: 1px solid #b6d7ff;
+    }
+
+    div.stButton > button {
+        width: 52px;
+        height: 52px;
+        padding: 0px;
+        font-size: 22px;
+        font-weight: bold;
+        border-radius: 10px;
+        background-color: #f7dfaa;
+        color: #111827;
+        border: 1px solid #d6ad60;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        transition: 0.2s;
+    }
+
+    div.stButton > button:hover {
+        background-color: #e9c46a;
+        border: 1px solid #b7791f;
+        color: #111827;
+        transform: scale(1.03);
+    }
+
+    div.stButton > button:disabled {
+        background-color: #f5deb3;
+        color: #111827;
+        opacity: 1;
+        border: 1px solid #d6ad60;
+    }
+
+    .stButton button p {
+        font-size: 22px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+st.title("CỜ VÂY 9x9 - AI MINIMAX ALPHA-BETA")
+st.markdown('<div class="sub-title">Người chơi: <b>X</b> | AI: <b>O</b></div>', unsafe_allow_html=True)
 
 black_score, white_score = st.session_state.game.calculate_score(st.session_state.board)
 
@@ -90,21 +162,6 @@ with col3:
 
 st.info(st.session_state.message)
 
-st.markdown(
-    """
-    <style>
-    div.stButton > button {
-        width: 42px;
-        height: 42px;
-        padding: 0px;
-        font-size: 20px;
-        font-weight: bold;
-        border-radius: 6px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 for i in range(BOARD_SIZE):
     cols = st.columns(BOARD_SIZE)
@@ -126,17 +183,19 @@ for i in range(BOARD_SIZE):
                 player_move(i, j)
                 st.rerun()
 
+
 st.divider()
 
 left, right = st.columns(2)
 
 with left:
-    if st.button("🔄 Chơi lại"):
+    if st.button("🔄"):
         init_game()
         st.rerun()
+    st.caption("Chơi lại")
 
 with right:
-    if st.button("🏁 Kết thúc & tính điểm"):
+    if st.button("🏁"):
         st.session_state.game_over = True
         winner, black_score, white_score = st.session_state.game.get_winner(st.session_state.board)
 
@@ -148,11 +207,14 @@ with right:
             st.session_state.message = f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
 
         st.rerun()
+    st.caption("Kết thúc & tính điểm")
+
 
 with st.expander("Giải thích thuật toán"):
     st.write(
         """
         AI sử dụng thuật toán **Minimax** để giả lập các nước đi có thể xảy ra.
+
         Trong quá trình tìm kiếm, chương trình dùng **Alpha-Beta Pruning**
         để loại bỏ những nhánh không cần xét, giúp AI tìm nước đi nhanh hơn.
 
