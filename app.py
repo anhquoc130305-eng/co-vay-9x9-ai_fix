@@ -4,7 +4,7 @@ from ai import MinimaxAI
 
 
 st.set_page_config(
-    page_title="Cờ Vay 9x9 AI",
+    page_title="Cờ Vây 9x9 AI",
     page_icon="⚫",
     layout="centered"
 )
@@ -16,6 +16,7 @@ def init_game():
     st.session_state.board = st.session_state.game.board
     st.session_state.game_over = False
     st.session_state.message = "Bạn là ⚫. AI là ⚪. Bạn đi trước."
+    st.session_state.last_move = None
 
 
 if "game" not in st.session_state:
@@ -34,6 +35,7 @@ def run_ai_move():
 
     x, y = move
     st.session_state.board = game.make_move(st.session_state.board, x, y, WHITE)
+    st.session_state.last_move = (x, y)
     st.session_state.message = f"AI vừa đánh tại dòng {x + 1}, cột {y + 1}. Đến lượt bạn."
 
 
@@ -67,6 +69,7 @@ def player_move(x, y):
         return
 
     st.session_state.board = game.make_move(st.session_state.board, x, y, BLACK)
+    st.session_state.last_move = (x, y)
 
     if check_game_over():
         return
@@ -75,116 +78,134 @@ def player_move(x, y):
     check_game_over()
 
 
+# xử lý click từ bàn cờ HTML
+move = st.query_params.get("move")
+if move and not st.session_state.game_over:
+    try:
+        x, y = map(int, move.split("-"))
+        player_move(x, y)
+    except:
+        pass
+
+    st.query_params.clear()
+    st.rerun()
+
+
 st.markdown(
     """
     <style>
     .stApp {
-        background: radial-gradient(circle at top, #1f2937 0%, #111827 45%, #020617 100%);
-        color: #e5e7eb;
+        background: #0f172a;
+        color: white;
     }
 
     h1 {
         text-align: center;
-        color: #f9fafb;
+        color: #f8fafc;
         font-size: 34px;
         font-weight: 900;
-        margin-bottom: 0px;
     }
 
-    .sub-title {
+    .subtitle {
         text-align: center;
         color: #cbd5e1;
-        font-size: 17px;
-        margin-bottom: 24px;
-    }
-
-    .game-card {
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        border-radius: 22px;
-        padding: 22px;
-        box-shadow: 0 20px 45px rgba(0,0,0,0.35);
-        margin-bottom: 18px;
-    }
-
-    [data-testid="stMetric"] {
-        background: #0f172a;
-        border: 1px solid #334155;
-        border-radius: 16px;
-        padding: 14px;
-        box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-    }
-
-    [data-testid="stMetricLabel"] {
-        color: #94a3b8;
-    }
-
-    [data-testid="stMetricValue"] {
-        color: #f8fafc;
-        font-size: 24px;
+        margin-bottom: 20px;
     }
 
     div[data-testid="stAlert"] {
-        background-color: #172554;
+        background-color: #1e3a8a;
         color: #dbeafe;
-        border: 1px solid #3b82f6;
         border-radius: 14px;
-        font-size: 17px;
+        border: 1px solid #3b82f6;
+    }
+
+    [data-testid="stMetric"] {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .board-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 18px;
+    }
+
+    .go-board {
+        width: 540px;
+        height: 540px;
+        background-color: #c98f3a;
+        background-image:
+            linear-gradient(#2b1a08 2px, transparent 2px),
+            linear-gradient(90deg, #2b1a08 2px, transparent 2px);
+        background-size: 67.5px 67.5px;
+        background-position: 33.75px 33.75px;
+        border: 6px solid #8b5a1e;
+        border-radius: 8px;
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        grid-template-rows: repeat(9, 1fr);
+        box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+    }
+
+    .cell {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .stone {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        box-shadow: 0 5px 12px rgba(0,0,0,0.45);
+    }
+
+    .black {
+        background: radial-gradient(circle at 30% 25%, #64748b, #020617 65%);
+    }
+
+    .white {
+        background: radial-gradient(circle at 30% 25%, #ffffff, #cbd5e1 70%);
+    }
+
+    .last {
+        outline: 4px solid #22c55e;
+        outline-offset: 3px;
+    }
+
+    .empty:hover {
+        background: rgba(255,255,255,0.18);
+        border-radius: 50%;
+    }
+
+    .guide {
+        text-align: center;
+        color: #cbd5e1;
+        font-size: 14px;
+        margin-bottom: 24px;
     }
 
     div.stButton > button {
-        width: 48px;
-        height: 48px;
-        padding: 0px;
-        font-size: 24px;
-        font-weight: bold;
+        width: 100%;
+        height: 46px;
         border-radius: 12px;
-        background-color: #b8833b;
-        color: #111827;
-        border: 1px solid #facc15;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 10px rgba(0,0,0,0.35);
-        transition: 0.15s ease-in-out;
+        font-size: 16px;
+        font-weight: 700;
+        background: #1e293b;
+        color: #f8fafc;
+        border: 1px solid #475569;
     }
 
     div.stButton > button:hover {
-        background-color: #d99b45;
-        border: 1px solid #fde68a;
-        transform: scale(1.06);
-    }
-
-    div.stButton > button:disabled {
-        opacity: 1;
-        background-color: #b8833b;
-        color: #111827;
-        border: 1px solid #facc15;
-    }
-
-    .stButton button p {
-        font-size: 24px;
-        line-height: 1;
-    }
-
-    .control-btn button {
-        width: 100% !important;
-        height: 48px !important;
-        font-size: 16px !important;
-        border-radius: 14px !important;
-        background: #1e293b !important;
-        color: #f8fafc !important;
-        border: 1px solid #475569 !important;
-    }
-
-    .small-guide {
-        color: #cbd5e1;
-        text-align: center;
-        font-size: 14px;
-        margin-top: 10px;
-    }
-
-    div[data-testid="stExpander"] {
-        background-color: #0f172a;
-        border: 1px solid #334155;
-        border-radius: 14px;
+        background: #334155;
+        color: white;
+        border: 1px solid #64748b;
     }
     </style>
     """,
@@ -194,7 +215,7 @@ st.markdown(
 
 st.title("CỜ VÂY 9x9")
 st.markdown(
-    '<div class="sub-title">Bạn: <b>⚫ Quân đen</b> &nbsp; | &nbsp; AI: <b>⚪ Quân trắng</b></div>',
+    '<div class="subtitle">Bạn: <b>⚫ Quân đen</b> | AI: <b>⚪ Quân trắng</b></div>',
     unsafe_allow_html=True
 )
 
@@ -210,51 +231,50 @@ with col3:
 
 st.info(st.session_state.message)
 
-st.markdown('<div class="game-card">', unsafe_allow_html=True)
+
+board_html = '<div class="board-wrap"><div class="go-board">'
 
 for i in range(BOARD_SIZE):
-    cols = st.columns(BOARD_SIZE, gap="small")
-
     for j in range(BOARD_SIZE):
         cell = st.session_state.board[i][j]
+        is_last = st.session_state.last_move == (i, j)
 
         if cell == BLACK:
-            label = "⚫"
+            last_class = " last" if is_last else ""
+            board_html += f'<div class="cell"><div class="stone black{last_class}"></div></div>'
+
         elif cell == WHITE:
-            label = "⚪"
+            last_class = " last" if is_last else ""
+            board_html += f'<div class="cell"><div class="stone white{last_class}"></div></div>'
+
         else:
-            label = "·"
+            if st.session_state.game_over:
+                board_html += '<div class="cell"></div>'
+            else:
+                board_html += f'<a class="cell empty" href="?move={i}-{j}"></a>'
 
-        disabled = st.session_state.game_over or cell != EMPTY
+board_html += '</div></div>'
 
-        with cols[j]:
-            if st.button(label, key=f"{i}-{j}", disabled=disabled):
-                player_move(i, j)
-                st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown(board_html, unsafe_allow_html=True)
 
 st.markdown(
-    '<div class="small-guide">Chọn dấu <b>·</b> để đặt quân. Quân đã đánh sẽ không chọn lại được.</div>',
+    '<div class="guide">Bấm vào giao điểm trống để đặt quân. Quân vừa đánh sẽ có vòng màu xanh.</div>',
     unsafe_allow_html=True
 )
-
-st.divider()
 
 left, right = st.columns(2)
 
 with left:
-    st.markdown('<div class="control-btn">', unsafe_allow_html=True)
     if st.button("🔄 Chơi lại"):
         init_game()
         st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
-    st.markdown('<div class="control-btn">', unsafe_allow_html=True)
     if st.button("🏁 Kết thúc & tính điểm"):
         st.session_state.game_over = True
-        winner, black_score, white_score = st.session_state.game.get_winner(st.session_state.board)
+        winner, black_score, white_score = st.session_state.game.get_winner(
+            st.session_state.board
+        )
 
         if winner == BLACK:
             st.session_state.message = f"Bạn thắng! ⚫ {black_score} - ⚪ {white_score}"
@@ -264,7 +284,6 @@ with right:
             st.session_state.message = f"Hòa! ⚫ {black_score} - ⚪ {white_score}"
 
         st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 
 
 with st.expander("Giải thích thuật toán"):
@@ -272,13 +291,9 @@ with st.expander("Giải thích thuật toán"):
         """
         AI sử dụng thuật toán **Minimax** để tìm nước đi tốt nhất.
 
-        Trong quá trình tìm kiếm, chương trình dùng **Alpha-Beta Pruning**
-        để bỏ qua các nhánh không cần xét, giúp AI chạy nhanh hơn.
+        Chương trình dùng **Alpha-Beta Pruning** để bỏ qua các nhánh không cần xét,
+        giúp AI chạy nhanh hơn.
 
-        Hàm đánh giá bàn cờ dựa trên:
-
-        - Số quân của mỗi bên
-        - Số khí còn lại của nhóm quân
-        - Chênh lệch điểm giữa AI và người chơi
+        Hàm đánh giá dựa trên số quân, số khí và chênh lệch điểm giữa hai bên.
         """
     )
