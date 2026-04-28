@@ -51,7 +51,6 @@ def check_game_over():
             st.session_state.message = f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
 
         return True
-
     return False
 
 
@@ -78,132 +77,147 @@ st.markdown(
     """
     <style>
     .stApp {
-        background: #f7f0df;
+        background: radial-gradient(circle at top, #1f2937 0%, #0f172a 45%, #020617 100%);
+        color: #e5e7eb;
     }
 
     h1 {
         text-align: center;
-        color: #1f2937;
-        font-weight: 800;
+        color: #f9fafb;
+        font-weight: 900;
     }
 
     .sub-title {
         text-align: center;
         font-size: 18px;
-        color: #374151;
+        color: #cbd5e1;
         margin-bottom: 20px;
     }
 
     [data-testid="stMetric"] {
-        background-color: #fffaf0;
-        padding: 16px;
-        border-radius: 14px;
-        border: 1px solid #e0c38a;
+        background: #111827;
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid #334155;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #cbd5e1 !important;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #ffffff !important;
     }
 
     div[data-testid="stAlert"] {
-        border-radius: 12px;
-        background-color: #fff7dc;
-        color: #5c3b00;
-        border: 1px solid #d6ad60;
+        border-radius: 14px;
+        background-color: #172554;
+        color: #bfdbfe;
+        border: 1px solid #2563eb;
     }
 
     div[data-testid="column"] {
         padding: 0 !important;
     }
 
-    .board-wrap {
-        width: 504px;
-        height: 504px;
-        margin: 28px auto;
-        background-color: #d9a441;
-        border: 14px solid #8b5a1e;
-        border-radius: 10px;
-        box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+    .board-box {
+        width: 520px;
+        height: 520px;
+        margin: 30px auto 10px auto;
+        background: #d9a441;
+        border: 16px solid #7c4a12;
+        border-radius: 14px;
+        box-shadow: 0 22px 45px rgba(0,0,0,0.55);
         position: relative;
-        padding: 0;
     }
 
-    .board-wrap::before {
-        content: "";
+    .board-lines {
         position: absolute;
-        left: 31px;
-        top: 31px;
-        width: 440px;
-        height: 440px;
+        inset: 42px;
         background-image:
-            linear-gradient(to right, #2b1a08 2px, transparent 2px),
-            linear-gradient(to bottom, #2b1a08 2px, transparent 2px);
-        background-size: 55px 55px;
+            linear-gradient(to right, #1f1305 2px, transparent 2px),
+            linear-gradient(to bottom, #1f1305 2px, transparent 2px);
+        background-size: 54px 54px;
         background-position: 0 0;
-        pointer-events: none;
+        width: 432px;
+        height: 432px;
     }
 
-    .board-area {
+    .board-buttons {
+        width: 520px;
+        margin: -530px auto 35px auto;
         position: relative;
-        z-index: 2;
-        width: 504px;
-        height: 504px;
-        display: grid;
-        grid-template-columns: repeat(9, 56px);
-        grid-template-rows: repeat(9, 56px);
+        z-index: 10;
     }
 
-    .stone-button {
-        width: 56px;
-        height: 56px;
-    }
-
-    div.stButton > button {
-        width: 56px;
-        height: 56px;
+    .board-buttons .stButton > button {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
         padding: 0 !important;
         margin: 0 !important;
-        border-radius: 50%;
-        border: none;
-        background-color: transparent;
-        color: transparent;
-        box-shadow: none;
-        font-size: 0;
+        border-radius: 50% !important;
+        border: none !important;
+        background: transparent !important;
+        color: transparent !important;
+        box-shadow: none !important;
     }
 
-    div.stButton > button:hover {
-        background-color: rgba(255,255,255,0.22);
-        border-radius: 50%;
-        border: 1px dashed rgba(0,0,0,0.35);
+    .board-buttons .stButton > button:hover {
+        background: rgba(255,255,255,0.25) !important;
+        border: 1px dashed rgba(0,0,0,0.4) !important;
     }
 
-    div.stButton > button:disabled {
+    .board-buttons .stButton > button:disabled {
         opacity: 1 !important;
-        background-color: transparent;
-        border: none;
     }
 
-    div.stButton > button p {
+    .board-buttons .stButton > button p {
         font-size: 28px !important;
         line-height: 1 !important;
         margin: 0 !important;
-        color: inherit !important;
     }
 
-    div.stButton > button:disabled p {
+    .board-buttons .stButton > button:disabled p {
         opacity: 1 !important;
     }
 
-    button:has(p:contains("⚫")) {
-        background: radial-gradient(circle at 30% 30%, #666, #111 70%) !important;
-        color: transparent !important;
-        box-shadow: 2px 3px 8px rgba(0,0,0,0.45) !important;
+    .black-stone {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 25%, #777, #050505 72%);
+        box-shadow: 3px 4px 10px rgba(0,0,0,0.55);
+        margin: auto;
     }
 
-    button:has(p:contains("⚪")) {
-        background: radial-gradient(circle at 30% 30%, #ffffff, #d8d8d8 75%) !important;
-        color: transparent !important;
-        box-shadow: 2px 3px 8px rgba(0,0,0,0.28) !important;
+    .white-stone {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 25%, #ffffff, #d1d5db 75%);
+        box-shadow: 3px 4px 10px rgba(0,0,0,0.35);
+        margin: auto;
     }
 
-    .control-btn {
-        text-align: center;
+    .empty-point {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #1f1305;
+        margin: auto;
+        opacity: 0.9;
+    }
+
+    .control button {
+        width: 100% !important;
+        height: 48px !important;
+        border-radius: 12px !important;
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #475569 !important;
     }
     </style>
     """,
@@ -226,20 +240,21 @@ with col3:
 
 st.info(st.session_state.message)
 
-st.markdown('<div class="board-wrap"><div class="board-area">', unsafe_allow_html=True)
+st.markdown('<div class="board-box"><div class="board-lines"></div></div>', unsafe_allow_html=True)
+st.markdown('<div class="board-buttons">', unsafe_allow_html=True)
 
 for i in range(BOARD_SIZE):
-    cols = st.columns(BOARD_SIZE, gap="small")
+    left_space, *cols, right_space = st.columns([0.18] + [1] * BOARD_SIZE + [0.18], gap="small")
 
     for j in range(BOARD_SIZE):
         cell = st.session_state.board[i][j]
 
         if cell == BLACK:
-            label = "⚫"
+            label = "●"
         elif cell == WHITE:
-            label = "⚪"
+            label = "○"
         else:
-            label = " "
+            label = "·"
 
         disabled = st.session_state.game_over or cell != EMPTY
 
@@ -248,10 +263,11 @@ for i in range(BOARD_SIZE):
                 player_move(i, j)
                 st.rerun()
 
-st.markdown("</div></div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
 st.divider()
 
+st.markdown('<div class="control">', unsafe_allow_html=True)
 left, right = st.columns(2)
 
 with left:
@@ -272,6 +288,8 @@ with right:
             st.session_state.message = f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
 
         st.rerun()
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 with st.expander("Giải thích thuật toán"):
     st.write(
