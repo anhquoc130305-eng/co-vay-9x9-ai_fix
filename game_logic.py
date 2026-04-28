@@ -108,25 +108,46 @@ class GoGame:
 
         return moves
 
-    def evaluate_board(self, board):
-        ai_score = 0
-        human_score = 0
-        visited = set()
+   def evaluate_board(self, board):
+    ai_score = 0
+    human_score = 0
+    visited = set()
 
-        for i in range(BOARD_SIZE):
-            for j in range(BOARD_SIZE):
-                if board[i][j] != EMPTY and (i, j) not in visited:
-                    group = self.get_group(board, i, j, visited)
-                    liberties = self.count_liberties(board, group)
+    center = BOARD_SIZE // 2
 
-                    score = len(group) * 10 + liberties * 3
+    for i in range(BOARD_SIZE):
+        for j in range(BOARD_SIZE):
+            if board[i][j] != EMPTY and (i, j) not in visited:
+                group = self.get_group(board, i, j, visited)
+                liberties = self.count_liberties(board, group)
 
-                    if board[i][j] == WHITE:
-                        ai_score += score
-                    else:
-                        human_score += score
+                group_size = len(group)
 
-        return ai_score - human_score
+                # thưởng vị trí trung tâm
+                center_bonus = 0
+                for x, y in group:
+                    dist = abs(x - center) + abs(y - center)
+                    center_bonus += max(0, 4 - dist)
+
+                # phạt nếu liberties quá thấp
+                danger_penalty = 0
+                if liberties <= 1:
+                    danger_penalty = -15
+
+                # heuristic mới
+                score = (
+                    group_size * 12
+                    + liberties * 5
+                    + center_bonus * 2
+                    + danger_penalty
+                )
+
+                if board[i][j] == WHITE:
+                    ai_score += score
+                else:
+                    human_score += score
+
+    return ai_score - human_score
 
     def calculate_score(self, board):
         black_score = 0
