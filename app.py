@@ -4,7 +4,7 @@ from ai import MinimaxAI
 
 
 st.set_page_config(
-    page_title="Cờ Vây 9x9 AI",
+    page_title="Cờ Vay 9x9 AI",
     page_icon="⚫",
     layout="centered"
 )
