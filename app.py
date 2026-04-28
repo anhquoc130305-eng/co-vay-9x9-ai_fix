@@ -24,6 +24,7 @@ def init_game():
     st.session_state.game_over = False
     st.session_state.message = "Bạn là X. AI là O. Bạn đi trước."
     st.session_state.last_click_time = None
+    st.session_state.board_key = st.session_state.get("board_key", 0) + 1
 
 
 if "game" not in st.session_state:
@@ -257,7 +258,7 @@ board_image = draw_board(st.session_state.board)
 
 value = streamlit_image_coordinates(
     board_image,
-    key="go_board",
+    key=f"go_board_{st.session_state.board_key}",
     width=BOARD_PIXELS
 )
 
