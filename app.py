@@ -7,7 +7,7 @@ from ai import MinimaxAI
 
 
 st.set_page_config(
-    page_title="Cờ Vây 9x9 AI",
+    page_title="Cờ Vay 9x9 AI",
     page_icon="⚫",
     layout="centered"
 )
@@ -26,8 +26,15 @@ def init_game():
     st.session_state.message = "Bạn là X. AI là O. Bạn đi trước."
 
 
+def reset_board_key():
+    st.session_state.board_key = st.session_state.get("board_key", 0) + 1
+
+
 if "game" not in st.session_state:
     init_game()
+
+if "board_key" not in st.session_state:
+    st.session_state.board_key = 0
 
 
 def draw_board(board):
@@ -136,6 +143,7 @@ def check_game_over():
         else:
             st.session_state.message = f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
 
+        reset_board_key()
         return True
 
     return False
@@ -149,6 +157,7 @@ def player_move(x, y):
 
     if not game.is_valid_move(st.session_state.board, x, y, BLACK):
         st.session_state.message = "Nước đi không hợp lệ. Hãy chọn vị trí khác."
+        reset_board_key()
         return
 
     st.session_state.board = game.make_move(st.session_state.board, x, y, BLACK)
@@ -158,6 +167,7 @@ def player_move(x, y):
 
     run_ai_move()
     check_game_over()
+    reset_board_key()
 
 
 st.markdown(
@@ -225,7 +235,7 @@ st.markdown(
 )
 
 
-st.title("CỜ VÂY 9x9 - AI MINIMAX ALPHA-BETA")
+st.title("CỜ VAY 9x9 - AI MINIMAX ALPHA-BETA")
 st.markdown(
     '<div class="sub-title">Người chơi: <b>X</b> | AI: <b>O</b></div>',
     unsafe_allow_html=True
@@ -250,7 +260,7 @@ board_image = draw_board(st.session_state.board)
 
 value = streamlit_image_coordinates(
     board_image,
-    key="go_board",
+    key=f"go_board_{st.session_state.board_key}",
     width=BOARD_PIXELS
 )
 
@@ -272,6 +282,7 @@ with col1:
         use_container_width=True
     ):
         init_game()
+        reset_board_key()
         st.rerun()
 
 with col2:
@@ -299,6 +310,7 @@ with col2:
                 f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
             )
 
+        reset_board_key()
         st.rerun()
 
 
