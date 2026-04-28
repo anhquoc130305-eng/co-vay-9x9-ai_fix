@@ -23,7 +23,7 @@ def init_game():
     st.session_state.board = st.session_state.game.board
     st.session_state.game_over = False
     st.session_state.message = "Bạn là X. AI là O. Bạn đi trước."
-    st.session_state.last_click = None
+    st.session_state.last_click_time = None
 
 
 if "game" not in st.session_state:
@@ -92,17 +92,24 @@ def get_click_position(value):
     click_x = value["x"]
     click_y = value["y"]
 
-    col = round((click_x - MARGIN) / CELL)
-    row = round((click_y - MARGIN) / CELL)
+    nearest_row = None
+    nearest_col = None
+    min_distance = 999999
 
-    if 0 <= row < BOARD_SIZE and 0 <= col < BOARD_SIZE:
-        real_x = MARGIN + col * CELL
-        real_y = MARGIN + row * CELL
+    for row in range(BOARD_SIZE):
+        for col in range(BOARD_SIZE):
+            point_x = MARGIN + col * CELL
+            point_y = MARGIN + row * CELL
 
-        distance = ((click_x - real_x) ** 2 + (click_y - real_y) ** 2) ** 0.5
+            distance = ((click_x - point_x) ** 2 + (click_y - point_y) ** 2) ** 0.5
 
-        if distance <= 24:
-            return row, col
+            if distance < min_distance:
+                min_distance = distance
+                nearest_row = row
+                nearest_col = col
+
+    if min_distance <= 16:
+        return nearest_row, nearest_col
 
     return None
 
@@ -254,15 +261,18 @@ value = streamlit_image_coordinates(
     width=BOARD_PIXELS
 )
 
-position = get_click_position(value)
+if value is not None and not st.session_state.game_over:
+    click_time = str(value)
 
-if position is not None and not st.session_state.game_over:
-    click_id = f"{position[0]}-{position[1]}"
+    if st.session_state.last_click_time != click_time:
+        st.session_state.last_click_time = click_time
 
-    if st.session_state.last_click != click_id:
-        st.session_state.last_click = click_id
-        x, y = position
-        player_move(x, y)
+        position = get_click_position(value)
+
+        if position is not None:
+            x, y = position
+            player_move(x, y)
+            st.rerun()
 
 st.divider()
 
@@ -302,7 +312,7 @@ with col2:
                 f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
             )
 
-        st.session_state.last_click = None
+        st.session_state.last_click_time = None
         st.rerun()
 
 
