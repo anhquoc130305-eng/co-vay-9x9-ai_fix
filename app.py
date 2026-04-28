@@ -20,7 +20,7 @@ BOARD_PIXELS = MARGIN * 2 + CELL * (BOARD_SIZE - 1)
 
 def init_game():
     st.session_state.game = GoGame()
-    st.session_state.ai = MinimaxAI(st.session_state.game, depth=2)
+    st.session_state.ai = MinimaxAI(st.session_state.game, depth=1)
     st.session_state.board = st.session_state.game.board
     st.session_state.game_over = False
     st.session_state.message = "Bạn là X. AI là O. Bạn đi trước."
