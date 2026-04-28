@@ -78,19 +78,6 @@ def player_move(x, y):
     check_game_over()
 
 
-# xử lý click từ bàn cờ HTML
-move = st.query_params.get("move")
-if move and not st.session_state.game_over:
-    try:
-        x, y = map(int, move.split("-"))
-        player_move(x, y)
-    except:
-        pass
-
-    st.query_params.clear()
-    st.rerun()
-
-
 st.markdown(
     """
     <style>
@@ -104,12 +91,14 @@ st.markdown(
         color: #f8fafc;
         font-size: 34px;
         font-weight: 900;
+        margin-bottom: 6px;
     }
 
     .subtitle {
         text-align: center;
         color: #cbd5e1;
         margin-bottom: 20px;
+        font-size: 15px;
     }
 
     div[data-testid="stAlert"] {
@@ -126,62 +115,70 @@ st.markdown(
         padding: 14px;
     }
 
-    .board-wrap {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-        margin-bottom: 18px;
+    [data-testid="stMetricLabel"] {
+        color: #cbd5e1;
     }
 
-    .go-board {
-        width: 540px;
-        height: 540px;
+    [data-testid="stMetricValue"] {
+        color: #f8fafc;
+    }
+
+    .board-area {
+        width: 520px;
+        height: 520px;
+        margin: 28px auto 12px auto;
         background-color: #c98f3a;
+        border: 6px solid #8b5a1e;
+        border-radius: 10px;
+        box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+        padding: 20px;
+        position: relative;
+    }
+
+    .board-area::before {
+        content: "";
+        position: absolute;
+        left: 45px;
+        top: 45px;
+        width: 400px;
+        height: 400px;
         background-image:
             linear-gradient(#2b1a08 2px, transparent 2px),
             linear-gradient(90deg, #2b1a08 2px, transparent 2px);
-        background-size: 67.5px 67.5px;
-        background-position: 33.75px 33.75px;
-        border: 6px solid #8b5a1e;
-        border-radius: 8px;
-        display: grid;
-        grid-template-columns: repeat(9, 1fr);
-        grid-template-rows: repeat(9, 1fr);
-        box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+        background-size: 50px 50px;
+        background-position: 0 0;
+        pointer-events: none;
     }
 
-    .cell {
-        width: 60px;
-        height: 60px;
+    div[data-testid="column"] {
         display: flex;
-        align-items: center;
         justify-content: center;
-        text-decoration: none;
+        align-items: center;
     }
 
-    .stone {
-        width: 38px;
-        height: 38px;
+    div.stButton > button {
+        width: 44px;
+        height: 44px;
+        padding: 0;
         border-radius: 50%;
-        box-shadow: 0 5px 12px rgba(0,0,0,0.45);
+        border: none;
+        background: transparent;
+        color: #111827;
+        font-size: 24px;
+        box-shadow: none;
+        position: relative;
+        z-index: 3;
     }
 
-    .black {
-        background: radial-gradient(circle at 30% 25%, #64748b, #020617 65%);
-    }
-
-    .white {
-        background: radial-gradient(circle at 30% 25%, #ffffff, #cbd5e1 70%);
-    }
-
-    .last {
-        outline: 4px solid #22c55e;
-        outline-offset: 3px;
-    }
-
-    .empty:hover {
-        background: rgba(255,255,255,0.18);
+    div.stButton > button:hover {
+        background: rgba(255,255,255,0.22);
         border-radius: 50%;
+    }
+
+    div.stButton > button:disabled {
+        background: transparent;
+        color: inherit;
+        opacity: 1;
     }
 
     .guide {
@@ -191,21 +188,27 @@ st.markdown(
         margin-bottom: 24px;
     }
 
-    div.stButton > button {
-        width: 100%;
-        height: 46px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 700;
-        background: #1e293b;
-        color: #f8fafc;
-        border: 1px solid #475569;
+    .control button {
+        width: 100% !important;
+        height: 46px !important;
+        border-radius: 12px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #475569 !important;
     }
 
-    div.stButton > button:hover {
-        background: #334155;
-        color: white;
-        border: 1px solid #64748b;
+    .control button:hover {
+        background: #334155 !important;
+        color: white !important;
+        border: 1px solid #64748b !important;
+    }
+
+    div[data-testid="stExpander"] {
+        background-color: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 12px;
     }
     </style>
     """,
@@ -214,6 +217,7 @@ st.markdown(
 
 
 st.title("CỜ VÂY 9x9")
+
 st.markdown(
     '<div class="subtitle">Bạn: <b>⚫ Quân đen</b> | AI: <b>⚪ Quân trắng</b></div>',
     unsafe_allow_html=True
@@ -222,54 +226,61 @@ st.markdown(
 black_score, white_score = st.session_state.game.calculate_score(st.session_state.board)
 
 col1, col2, col3 = st.columns(3)
+
 with col1:
     st.metric("Bạn", black_score)
+
 with col2:
     st.metric("AI", white_score)
+
 with col3:
     st.metric("Bàn cờ", "9x9")
 
 st.info(st.session_state.message)
 
 
-board_html = '<div class="board-wrap"><div class="go-board">'
+st.markdown('<div class="board-area">', unsafe_allow_html=True)
 
 for i in range(BOARD_SIZE):
+    cols = st.columns(BOARD_SIZE, gap="small")
+
     for j in range(BOARD_SIZE):
         cell = st.session_state.board[i][j]
         is_last = st.session_state.last_move == (i, j)
 
         if cell == BLACK:
-            last_class = " last" if is_last else ""
-            board_html += f'<div class="cell"><div class="stone black{last_class}"></div></div>'
-
+            label = "🟢" if is_last else "⚫"
         elif cell == WHITE:
-            last_class = " last" if is_last else ""
-            board_html += f'<div class="cell"><div class="stone white{last_class}"></div></div>'
-
+            label = "🟢" if is_last else "⚪"
         else:
-            if st.session_state.game_over:
-                board_html += '<div class="cell"></div>'
-            else:
-                board_html += f'<a class="cell empty" href="?move={i}-{j}"></a>'
+            label = "·"
 
-board_html += '</div></div>'
+        disabled = st.session_state.game_over or cell != EMPTY
 
-st.markdown(board_html, unsafe_allow_html=True)
+        with cols[j]:
+            if st.button(label, key=f"move-{i}-{j}", disabled=disabled):
+                player_move(i, j)
+                st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown(
-    '<div class="guide">Bấm vào giao điểm trống để đặt quân. Quân vừa đánh sẽ có vòng màu xanh.</div>',
+    '<div class="guide">Bấm vào giao điểm để đặt quân. Quân vừa đánh sẽ hiện màu xanh.</div>',
     unsafe_allow_html=True
 )
+
 
 left, right = st.columns(2)
 
 with left:
+    st.markdown('<div class="control">', unsafe_allow_html=True)
     if st.button("🔄 Chơi lại"):
         init_game()
         st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
+    st.markdown('<div class="control">', unsafe_allow_html=True)
     if st.button("🏁 Kết thúc & tính điểm"):
         st.session_state.game_over = True
         winner, black_score, white_score = st.session_state.game.get_winner(
@@ -284,6 +295,7 @@ with right:
             st.session_state.message = f"Hòa! ⚫ {black_score} - ⚪ {white_score}"
 
         st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 with st.expander("Giải thích thuật toán"):
