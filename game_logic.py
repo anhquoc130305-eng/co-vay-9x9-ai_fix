@@ -20,6 +20,7 @@ class GoGame:
         for dx, dy in directions:
             nx = x + dx
             ny = y + dy
+
             if self.in_board(nx, ny):
                 result.append((nx, ny))
 
@@ -103,51 +104,50 @@ class GoGame:
 
         for i in range(BOARD_SIZE):
             for j in range(BOARD_SIZE):
+                if board[i][j] != EMPTY:
+                    continue
+
                 if self.is_valid_move(board, i, j, player):
                     moves.append((i, j))
 
         return moves
 
-   def evaluate_board(self, board):
-    ai_score = 0
-    human_score = 0
-    visited = set()
+    def evaluate_board(self, board):
+        ai_score = 0
+        human_score = 0
+        visited = set()
 
-    center = BOARD_SIZE // 2
+        center = BOARD_SIZE // 2
 
-    for i in range(BOARD_SIZE):
-        for j in range(BOARD_SIZE):
-            if board[i][j] != EMPTY and (i, j) not in visited:
-                group = self.get_group(board, i, j, visited)
-                liberties = self.count_liberties(board, group)
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                if board[i][j] != EMPTY and (i, j) not in visited:
+                    group = self.get_group(board, i, j, visited)
+                    liberties = self.count_liberties(board, group)
+                    group_size = len(group)
 
-                group_size = len(group)
+                    center_bonus = 0
+                    for x, y in group:
+                        dist = abs(x - center) + abs(y - center)
+                        center_bonus += max(0, 4 - dist)
 
-                # thưởng vị trí trung tâm
-                center_bonus = 0
-                for x, y in group:
-                    dist = abs(x - center) + abs(y - center)
-                    center_bonus += max(0, 4 - dist)
+                    danger_penalty = 0
+                    if liberties <= 1:
+                        danger_penalty = -15
 
-                # phạt nếu liberties quá thấp
-                danger_penalty = 0
-                if liberties <= 1:
-                    danger_penalty = -15
+                    score = (
+                        group_size * 12
+                        + liberties * 5
+                        + center_bonus * 2
+                        + danger_penalty
+                    )
 
-                # heuristic mới
-                score = (
-                    group_size * 12
-                    + liberties * 5
-                    + center_bonus * 2
-                    + danger_penalty
-                )
+                    if board[i][j] == WHITE:
+                        ai_score += score
+                    else:
+                        human_score += score
 
-                if board[i][j] == WHITE:
-                    ai_score += score
-                else:
-                    human_score += score
-
-    return ai_score - human_score
+        return ai_score - human_score
 
     def calculate_score(self, board):
         black_score = 0
