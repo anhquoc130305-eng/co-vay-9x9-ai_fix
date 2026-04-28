@@ -12,7 +12,6 @@ st.set_page_config(
     layout="centered"
 )
 
-
 CELL = 52
 MARGIN = 42
 BOARD_PIXELS = MARGIN * 2 + CELL * (BOARD_SIZE - 1)
@@ -24,17 +23,11 @@ def init_game():
     st.session_state.board = st.session_state.game.board
     st.session_state.game_over = False
     st.session_state.message = "Bạn là X. AI là O. Bạn đi trước."
-
-
-def reset_board_key():
-    st.session_state.board_key = st.session_state.get("board_key", 0) + 1
+    st.session_state.last_click = None
 
 
 if "game" not in st.session_state:
     init_game()
-
-if "board_key" not in st.session_state:
-    st.session_state.board_key = 0
 
 
 def draw_board(board):
@@ -143,7 +136,6 @@ def check_game_over():
         else:
             st.session_state.message = f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
 
-        reset_board_key()
         return True
 
     return False
@@ -157,7 +149,6 @@ def player_move(x, y):
 
     if not game.is_valid_move(st.session_state.board, x, y, BLACK):
         st.session_state.message = "Nước đi không hợp lệ. Hãy chọn vị trí khác."
-        reset_board_key()
         return
 
     st.session_state.board = game.make_move(st.session_state.board, x, y, BLACK)
@@ -167,7 +158,6 @@ def player_move(x, y):
 
     run_ai_move()
     check_game_over()
-    reset_board_key()
 
 
 st.markdown(
@@ -260,15 +250,19 @@ board_image = draw_board(st.session_state.board)
 
 value = streamlit_image_coordinates(
     board_image,
-    key=f"go_board_{st.session_state.board_key}",
+    key="go_board",
     width=BOARD_PIXELS
 )
 
 position = get_click_position(value)
 
 if position is not None and not st.session_state.game_over:
-    x, y = position
-    player_move(x, y)
+    click_id = f"{position[0]}-{position[1]}"
+
+    if st.session_state.last_click != click_id:
+        st.session_state.last_click = click_id
+        x, y = position
+        player_move(x, y)
 
 st.divider()
 
@@ -281,7 +275,6 @@ with col1:
         use_container_width=True
     ):
         init_game()
-        reset_board_key()
         st.rerun()
 
 with col2:
@@ -309,7 +302,7 @@ with col2:
                 f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
             )
 
-        reset_board_key()
+        st.session_state.last_click = None
         st.rerun()
 
 
