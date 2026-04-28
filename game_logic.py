@@ -115,6 +115,8 @@ class GoGame:
 
         for i in range(BOARD_SIZE):
             for j in range(BOARD_SIZE):
+                if board[i][j] != EMPTY:
+                    continue
                 if board[i][j] != EMPTY and (i, j) not in visited:
                     group = self.get_group(board, i, j, visited)
                     liberties = self.count_liberties(board, group)
