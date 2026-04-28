@@ -269,7 +269,6 @@ position = get_click_position(value)
 if position is not None and not st.session_state.game_over:
     x, y = position
     player_move(x, y)
-    st.rerun()
 
 st.divider()
 
