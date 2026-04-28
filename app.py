@@ -208,6 +208,20 @@ st.markdown(
         border-radius: 16px;
         box-shadow: 0 20px 45px rgba(0,0,0,0.55);
     }
+    div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+    height: 52px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    background: #1e293b !important;
+    color: white !important;
+    border: 1px solid #475569 !important;
+}
+
+div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
+    background: #334155 !important;
+    border: 1px solid #60a5fa !important;
+}
     </style>
     """,
     unsafe_allow_html=True
@@ -252,26 +266,43 @@ if position is not None and not st.session_state.game_over:
 
 st.divider()
 
-left, right = st.columns(2)
+st.markdown("###")
 
-with left:
-    if st.button("🔄 Chơi lại", use_container_width=True):
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button(
+        "🔄 Chơi lại",
+        key="reset_game_btn",
+        use_container_width=True
+    ):
         init_game()
         st.rerun()
 
-with right:
-    if st.button("🏁 Kết thúc & tính điểm", use_container_width=True):
+with col2:
+    if st.button(
+        "🏁 Kết thúc & tính điểm",
+        key="finish_game_btn",
+        use_container_width=True
+    ):
         st.session_state.game_over = True
+
         winner, black_score, white_score = st.session_state.game.get_winner(
             st.session_state.board
         )
 
         if winner == BLACK:
-            st.session_state.message = f"Bạn thắng! Điểm bạn: {black_score} - Điểm AI: {white_score}"
+            st.session_state.message = (
+                f"Bạn thắng! Điểm bạn: {black_score} - Điểm AI: {white_score}"
+            )
         elif winner == WHITE:
-            st.session_state.message = f"AI thắng! Điểm bạn: {black_score} - Điểm AI: {white_score}"
+            st.session_state.message = (
+                f"AI thắng! Điểm bạn: {black_score} - Điểm AI: {white_score}"
+            )
         else:
-            st.session_state.message = f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
+            st.session_state.message = (
+                f"Hòa! Điểm bạn: {black_score} - Điểm AI: {white_score}"
+            )
 
         st.rerun()
 
