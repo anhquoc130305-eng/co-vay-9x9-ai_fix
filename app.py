@@ -34,14 +34,12 @@ def draw_board(board):
     img = Image.new("RGB", (BOARD_PIXELS, BOARD_PIXELS), "#d9a441")
     draw = ImageDraw.Draw(img)
 
-    # viền bàn cờ
     draw.rectangle(
         [8, 8, BOARD_PIXELS - 8, BOARD_PIXELS - 8],
         outline="#7c4a12",
         width=14
     )
 
-    # đường kẻ
     for i in range(BOARD_SIZE):
         pos = MARGIN + i * CELL
 
@@ -57,14 +55,12 @@ def draw_board(board):
             width=2
         )
 
-    # sao nhỏ trên bàn 9x9
     star_points = [(2, 2), (2, 6), (4, 4), (6, 2), (6, 6)]
     for x, y in star_points:
         cx = MARGIN + y * CELL
         cy = MARGIN + x * CELL
         draw.ellipse([cx - 4, cy - 4, cx + 4, cy + 4], fill="#1f1305")
 
-    # quân cờ
     for i in range(BOARD_SIZE):
         for j in range(BOARD_SIZE):
             cx = MARGIN + j * CELL
@@ -208,20 +204,21 @@ st.markdown(
         border-radius: 16px;
         box-shadow: 0 20px 45px rgba(0,0,0,0.55);
     }
-    div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
-    height: 52px !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    border-radius: 12px !important;
-    background: #1e293b !important;
-    color: white !important;
-    border: 1px solid #475569 !important;
-}
 
-div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
-    background: #334155 !important;
-    border: 1px solid #60a5fa !important;
-}
+    div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+        height: 52px !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        background: #1e293b !important;
+        color: white !important;
+        border: 1px solid #475569 !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
+        background: #334155 !important;
+        border: 1px solid #60a5fa !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -266,8 +263,6 @@ if position is not None and not st.session_state.game_over:
 
 st.divider()
 
-st.markdown("###")
-
 col1, col2 = st.columns(2)
 
 with col1:
@@ -305,6 +300,7 @@ with col2:
             )
 
         st.rerun()
+
 
 with st.expander("Giải thích thuật toán"):
     st.write(
