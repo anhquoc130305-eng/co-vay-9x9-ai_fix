@@ -3,7 +3,7 @@ from game_logic import BLACK, WHITE
 
 
 class MinimaxAI:
-    def __init__(self, game, depth=2):
+    def __init__(self, game, depth=1):
         self.game = game
         self.depth = depth
 
